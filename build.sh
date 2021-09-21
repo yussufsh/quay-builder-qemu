@@ -7,11 +7,11 @@ CLOUD_IMAGE=${CLOUD_IMAGE:-""}
 
 if [ -z "$CLOUD_IMAGE" ]; then
     CHANNEL=${CHANNEL:-"stable"}
-    CHANNEL_MANIFEST_JSON=`curl https://builds.coreos.fedoraproject.org/streams/stable.json`
+    CHANNEL_MANIFEST_JSON=`curl https://builds.coreos.fedoraproject.org/streams/${CHANNEL}.json`
     LOCATION=`echo $CHANNEL_MANIFEST_JSON | jq '.architectures.x86_64.artifacts.qemu.formats."qcow2.xz".disk.location' | tr -d '"'`
     VERSION=`echo $CHANNEL_MANIFEST_JSON | jq '.architectures.x86_64.artifacts.qemu.release' | tr -d '"'`
 
-    time docker build --build-arg=channel=$CHANNEL --build-arg version=$VERSION --build-arg location=$LOCATION -t $IMAGE:$TAG .
+    time docker build --build-arg=channel=$CHANNEL --build-arg --build-arg -t $IMAGE:$TAG .
 else
-    time docker build --build-arg=channel=$CHANNEL --build-arg version=$VERSION --build-arg location=$CLOUD_IMAGE -t $IMAGE:$TAG .
+    time docker build --build-arg=channel=$CHANNEL --build-arg --build-arg location=$CLOUD_IMAGE -t $IMAGE:$TAG .
 fi
