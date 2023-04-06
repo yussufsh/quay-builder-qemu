@@ -23,9 +23,8 @@ RUN if [[ -z "$arg" ]] ; then \
         unxz coreos_production_qemu_image.qcow2.xz ; \
     else \
 	echo "Downloading" ${location} && \
-        curl -s -o coreos_production_qemu_image.qcow2.xz ${location} && \
-        unxz coreos_production_qemu_image.qcow2.xz ; \
-    fi
+        curl -s -o coreos_production_qemu_image.qcow2.xz ${location} && unxz coreos_production_qemu_image.qcow2.xz \
+    ; fi
 
 FROM base AS final
 ARG channel=stable
@@ -34,9 +33,9 @@ RUN mkdir -p /userdata
 WORKDIR /userdata
 
 RUN yum -y update && \
-        yum -y remove jq && \
-        yum -y install openssh-clients qemu-kvm && \
-        yum -y clean all
+    yum -y remove jq && \
+    yum -y install openssh-clients qemu-kvm && \
+    yum -y clean all
 
 COPY --from=executor-img /coreos_production_qemu_image.qcow2 /userdata/coreos_production_qemu_image.qcow2
 COPY start.sh /userdata/start.sh
