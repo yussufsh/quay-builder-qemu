@@ -6,19 +6,15 @@ RUN [ -z "${channel}" ] && echo "ARG channel is required" && exit 1 || true
 
 RUN yum -y install jq xz
 RUN ARCH=$(uname -m) ; echo $ARCH \
-    ; if [ "$ARCH" == "s390x" ] ; then ARCH=s390x ; elif [ "$ARCH" == "x86_64" ] ; then ARCH=x86_64 ; fi \
     ; curl https://builds.coreos.fedoraproject.org/streams/${channel}.json -o stable.json && \
-        cat stable.json | jq --arg arch "$ARCH" '.architectures[$arch].artifacts.qemu.release' | tr -d '"' 
-
-
+        cat stable.json | jq --arg arch "$ARCH" '.architectures[$arch].artifacts.qemu.release' | jq -r
 
 FROM base AS executor-img
 
 RUN if [[ -z "$arg" ]] ; then \
 	ARCH=$(uname -m) ; echo $ARCH ; \
-	if [ "$ARCH" == "s390x" ] ; then ARCH=s390x ; elif [ "$ARCH" == "x86_64" ] ; then ARCH=x86_64 ; fi ; \
-	echo "Downloading" $(cat stable.json | jq --arg arch "$ARCH" '.architectures[$arch].artifacts.qemu.formats."qcow2.xz".disk.location' | tr -d '"') && \
-        curl -s -o coreos_production_qemu_image.qcow2.xz $(cat stable.json | jq --arg arch "$ARCH" '.architectures[$arch].artifacts.qemu.formats."qcow2.xz".disk.location' | tr -d '"') && \
+	echo "Downloading" $(cat stable.json | jq --arg arch "$ARCH" '.architectures[$arch].artifacts.qemu.formats."qcow2.xz".disk.location' | jq -r ) && \
+        curl -s -o coreos_production_qemu_image.qcow2.xz $(cat stable.json | jq --arg arch "$ARCH" '.architectures[$arch].artifacts.qemu.formats."qcow2.xz".disk.location' | jq -r ) && \
         unxz coreos_production_qemu_image.qcow2.xz ; \
     else \
 	echo "Downloading" ${location} && \
