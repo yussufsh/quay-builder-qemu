@@ -9,7 +9,7 @@ ARCH=$(uname -m)
 if [ -z "$CLOUD_IMAGE" ]; then
     CHANNEL=${CHANNEL:-"stable"}
     CHANNEL_MANIFEST_JSON=`curl https://builds.coreos.fedoraproject.org/streams/${CHANNEL}.json`
-    LOCATION=`echo $CHANNEL_MANIFEST_JSON | jq --arg arch "$ARCH" '.architectures[$arch].artifacts.qemu.formats."qcow2.xz".disk.location' | jq -r`
+    LOCATION=`echo $CHANNEL_MANIFEST_JSON | jq -r --arg arch "$ARCH" '.architectures[$arch].artifacts.qemu.formats."qcow2.xz".disk.location'`
 
     time docker build --build-arg=channel=$CHANNEL --build-arg --build-arg -t $IMAGE:$TAG .
 else
