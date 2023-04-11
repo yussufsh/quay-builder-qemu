@@ -53,7 +53,3 @@ jobs:
           push: true
           file: Dockerfile
           tags: ${{ env.REGISTRY }}/${{ env.REPO_NAME }}:${{ github.event.inputs.tag || env.TAG }}
-
-
-
-
