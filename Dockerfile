@@ -14,7 +14,7 @@ FROM base AS executor-img
 
 RUN if [[ -z "$arg" ]] ; then \
 	ARCH=$(uname -m) ; echo $ARCH ; \
-	echo "Downloading" $(cat stable.json | jq --arg arch "$ARCH" '.architectures[$arch].artifacts.qemu.formats."qcow2.xz".disk.location' | jq -r ) && \
+	echo "Downloading" $(cat stable.json | jq -r --arg arch "$ARCH" '.architectures[$arch].artifacts.qemu.formats."qcow2.xz".disk.location') && \
 	curl -s -o coreos_production_qemu_image.qcow2.xz $(cat stable.json | jq --arg arch "$ARCH" '.architectures[$arch].artifacts.qemu.formats."qcow2.xz".disk.location' | jq -r ) && \
 		unxz coreos_production_qemu_image.qcow2.xz ; \
 	else \
