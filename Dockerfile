@@ -7,7 +7,7 @@ RUN [ -z "${channel}" ] && echo "ARG channel is required" && exit 1 || true
 RUN yum -y install jq
 RUN ARCH=$(uname -m) ; echo $ARCH \
 	; curl https://builds.coreos.fedoraproject.org/streams/${channel}.json -o stable.json && \
-		cat stable.json | jq --arg arch "$ARCH" '.architectures[$arch].artifacts.qemu.release' | jq -r
+		cat stable.json | jq -r --arg arch "$ARCH" '.architectures[$arch].artifacts.qemu.release'
 
 
 FROM base AS executor-img
@@ -15,7 +15,7 @@ FROM base AS executor-img
 RUN if [[ -z "$arg" ]] ; then \
 	ARCH=$(uname -m) ; echo $ARCH ; \
 	echo "Downloading" $(cat stable.json | jq -r --arg arch "$ARCH" '.architectures[$arch].artifacts.qemu.formats."qcow2.xz".disk.location') && \
-	curl -s -o coreos_production_qemu_image.qcow2.xz $(cat stable.json | jq --arg arch "$ARCH" '.architectures[$arch].artifacts.qemu.formats."qcow2.xz".disk.location' | jq -r ) && \
+	curl -s -o coreos_production_qemu_image.qcow2.xz $(cat stable.json | jq -r --arg arch "$ARCH" '.architectures[$arch].artifacts.qemu.formats."qcow2.xz".disk.location') && \
 		unxz coreos_production_qemu_image.qcow2.xz ; \
 	else \
 	echo "Downloading" ${location} && \
