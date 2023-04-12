@@ -1,19 +1,22 @@
-FROM centos:8 as base
+FROM quay.io/centos/centos:stream9 as base
 ARG channel="stable"
 ARG location
 
 RUN [ -z "${channel}" ] && echo "ARG channel is required" && exit 1 || true
 
 RUN yum -y install jq
-RUN curl https://builds.coreos.fedoraproject.org/streams/${channel}.json -o stable.json && \
-	cat stable.json | jq '.architectures.x86_64.artifacts.qemu.release' | tr -d '"'
+RUN ARCH=$(uname -m) ; echo $ARCH \
+	; curl https://builds.coreos.fedoraproject.org/streams/${channel}.json -o stable.json && \
+		cat stable.json | jq -r --arg arch "$ARCH" '.architectures[$arch].artifacts.qemu.release'
 
 
 FROM base AS executor-img
 
 RUN if [[ -z "$arg" ]] ; then \
-	echo "Downloading" $(cat stable.json | jq '.architectures.x86_64.artifacts.qemu.formats."qcow2.xz".disk.location' | tr -d '"') && \
-	curl -s -o coreos_production_qemu_image.qcow2.xz $(cat stable.json | jq '.architectures.x86_64.artifacts.qemu.formats."qcow2.xz".disk.location' | tr -d '"') && unxz coreos_production_qemu_image.qcow2.xz ; \
+	ARCH=$(uname -m) ; echo $ARCH ; \
+	echo "Downloading" $(cat stable.json | jq -r --arg arch "$ARCH" '.architectures[$arch].artifacts.qemu.formats."qcow2.xz".disk.location') && \
+	curl -s -o coreos_production_qemu_image.qcow2.xz $(cat stable.json | jq -r --arg arch "$ARCH" '.architectures[$arch].artifacts.qemu.formats."qcow2.xz".disk.location') && \
+		unxz coreos_production_qemu_image.qcow2.xz ; \
 	else \
 	echo "Downloading" ${location} && \
 	curl -s -o coreos_production_qemu_image.qcow2.xz ${location} && unxz coreos_production_qemu_image.qcow2.xz \
