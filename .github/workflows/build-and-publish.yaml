@@ -29,12 +29,6 @@ jobs:
         run: |
           BRANCH_NAME=${GITHUB_REF#refs/heads/}
           echo "::set-output name=version::${BRANCH_NAME/${{ env.BRANCH_PREFIX }}/}"
-      - name: Login to Quay.io
-        uses: docker/login-action@v1
-        with:
-          registry: quay.io
-          username: ${{ secrets.QUAY_USER }}
-          password: ${{ secrets.QUAY_TOKEN }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
