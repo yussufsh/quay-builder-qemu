@@ -46,7 +46,7 @@ jobs:
           build-args: |
             channel=stable
             image=quay.io/centos/centos:stream9
-          push: true
+          push: false
           file: Dockerfile
           tags: ${{ env.REGISTRY }}/${{ env.REPO_NAME }}:${{ github.event.inputs.tag }}-${{ env.TAG }}
           provenance: false
@@ -61,7 +61,7 @@ jobs:
           build-args: |
             channel=stable
             image=quay.io/centos/centos:stream9
-          push: true
+          push: false
           file: Dockerfile
           tags: ${{ env.REGISTRY }}/${{ env.REPO_NAME }}:${{ github.event.inputs.tag }}-${{ env.TAG }}
           provenance: false
@@ -76,7 +76,7 @@ jobs:
           build-args: |
             channel=stable
             image=quay.io/centos/centos:stream8
-          push: true
+          push: false
           file: Dockerfile
           tags: ${{ env.REGISTRY }}/${{ env.REPO_NAME }}:${{ github.event.inputs.tag }}-${{ env.TAG }}
           provenance: false
@@ -88,5 +88,5 @@ jobs:
         with:
           inputs: ${{ env.REGISTRY }}/${{ env.REPO_NAME }}:${{ github.event.inputs.tag || env.TAG }}
           images: ${{ env.REGISTRY }}/${{ env.REPO_NAME }}:${{ github.event.inputs.tag }}-amd64,${{ env.REGISTRY }}/${{ env.REPO_NAME }}:${{ github.event.inputs.tag }}-s390x,${{ env.REGISTRY }}/${{ env.REPO_NAME }}:${{ github.event.inputs.tag }}-ppc64le
-          push: true
+          push: false
           amend: true
