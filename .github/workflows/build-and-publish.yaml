@@ -39,38 +39,28 @@ jobs:
       - name: Build container for amd64
         id: docker_build
         uses: docker/build-push-action@v3
-        env:
-          TAG: amd64
         with:
           platforms: linux/amd64
-          build-args: |
-            channel=stable
-            image=quay.io/centos/centos:stream9
+          build-args: channel=stable
           push: false
           file: Dockerfile
-          tags: ${{ env.REGISTRY }}/${{ env.REPO_NAME }}:${{ github.event.inputs.tag }}-${{ env.TAG }}
+          tags: ${{ env.REGISTRY }}/${{ env.REPO_NAME }}:${{ github.event.inputs.tag }}-amd64
           provenance: false
 
       - name: Build and push s390x
         id: docker_build_s390x
         uses: docker/build-push-action@v3
-        env:
-          TAG: s390x
         with:
           platforms: linux/s390x
-          build-args: |
-            channel=stable
-            image=quay.io/centos/centos:stream9
+          build-args: channel=stable
           push: false
           file: Dockerfile
-          tags: ${{ env.REGISTRY }}/${{ env.REPO_NAME }}:${{ github.event.inputs.tag }}-${{ env.TAG }}
+          tags: ${{ env.REGISTRY }}/${{ env.REPO_NAME }}:${{ github.event.inputs.tag }}-s390x
           provenance: false
 
       - name: Build and push ppc64le
         id: docker_build_ppc64le
         uses: docker/build-push-action@v3
-        env:
-          TAG: ppc64le
         with:
           platforms: linux/ppc64le
           build-args: |
@@ -78,7 +68,7 @@ jobs:
             image=quay.io/centos/centos:stream8
           push: false
           file: Dockerfile
-          tags: ${{ env.REGISTRY }}/${{ env.REPO_NAME }}:${{ github.event.inputs.tag }}-${{ env.TAG }}
+          tags: ${{ env.REGISTRY }}/${{ env.REPO_NAME }}:${{ github.event.inputs.tag }}-ppc64le
           provenance: false
 
       - name: Build and push multi-arch manifest
@@ -87,6 +77,6 @@ jobs:
           TAG: ${{ steps.version-from-branch.outputs.version }}${{ env.TAG_SUFFIX }}
         with:
           inputs: ${{ env.REGISTRY }}/${{ env.REPO_NAME }}:${{ github.event.inputs.tag || env.TAG }}
-          images: ${{ env.REGISTRY }}/${{ env.REPO_NAME }}:${{ github.event.inputs.tag }}-amd64,${{ env.REGISTRY }}/${{ env.REPO_NAME }}:${{ github.event.inputs.tag }}-s390x,${{ env.REGISTRY }}/${{ env.REPO_NAME }}:${{ github.event.inputs.tag }}-ppc64le
+          images: ${{ steps.docker_build.outputs.imageid}},${{ steps.docker_build_s390x.outputs.imageid }},${{ steps.docker_build_ppc64le.outputs.imageid }}
           push: false
           amend: true
